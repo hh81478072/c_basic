@@ -8,9 +8,9 @@ typedef struct BST BST;
 
 struct TNode {
     void *data;
-    Tnode *left;
-    Tnode *right;
-} TNode;
+    TNode *left;
+    TNode *right;
+};
 
 struct BST {
     TNode *root;
@@ -26,19 +26,22 @@ static TNode *TNode_init(void* data) {
 
     ptr->data = data;
     ptr->left = NULL;
-    prt->right = NULL;
+    ptr->right = NULL;
 
     return ptr;
 }
 
-BST *BST_init(void* is_larger) {
+BST *BST_init(void) {
     BST *b = malloc(sizeof(BST));
 
     b->root = NULL;
-    if (f)
-        b->is_larger = is_larger;
+    b->is_larger = is_larger;
     
     return b;
+}
+
+void BST_register_larger(BST *b, void* is_larger) {
+    b->is_larger = is_larger;
 }
 
 typedef enum Ret_from {
@@ -64,10 +67,12 @@ void BST_trav(BST *b) {
             ret_from == RIGHT) {
             Stack_pop(s);
             parent = (TNode*)Stack_top(s);
+            if (!parent)
+                break;
 
-            if (!ptr->left && !ptr->right)
-                //PRINT
-            if (ptr = parent->left)
+            if (ret_from != RIGHT)
+                printf("val: %d\n", (int)ptr->data);
+            if (ptr == parent->left)
                 ret_from = LEFT;
             else
                 ret_from = RIGHT;
@@ -75,12 +80,21 @@ void BST_trav(BST *b) {
             Stack_add(s, (void*)ptr->left);
             ptr = ptr->left;
         } else if (ret_from != RIGHT && ptr->right) {
-            //PRINT
+            printf("val: %d\n", (int)ptr->data);
             ret_from = NONE;
             Stack_add(s, (void*)ptr->right);
+            
             ptr = ptr->right;
         }
     } 
+}
+void BST_trav2(TNode *n) {
+    if (!n)
+        return;
+
+    BST_trav2(n->left);
+    printf("val: %d\n", (int)n->data);
+    BST_trav2(n->right);
 }
 
 void BST_add(BST *b, void *data) {
@@ -114,20 +128,23 @@ void BST_add(BST *b, void *data) {
 
 
 int main (int argc, char *argv[]) {
-    int m[8];
-    for(int i = 0; i < 8; i++)
-        m[i] = i;
-    for(int i = 0; i < 8; i++) {
-        printf ("+%d\n", *(m + i));
-        printf ("[]%d\n", (&m[i]));
-    }
-/////////////////////////
-    uint8_t ui=255;
-    printf ("UI: %"PRIx8"\n", ui);
-    printf ("UI: %"PRIx8"\n", ++ui);
-    printf ("UI: %"PRIx8"\n", ++ui);
-    printf ("UI: %"PRIx8"\n", ++ui);
-    printf ("UI: %"PRIx8"\n", ++ui);
-    printf ("UI: %"PRIx8"\n", ++ui);
+    BST *b;
+    int *p;
+    b = BST_init();
+
+    p = 1; 
+    BST_add(b, p);
+    p = 2; 
+    BST_add(b, p);
+    p = 4; 
+    BST_add(b, p);
+    p = 3; 
+    BST_add(b, p);
+    BST_add(b, 17382);
+    BST_add(b, 1273);
+    BST_add(b, 147);
+    BST_add(b, 1373897);
+    BST_trav(b);
+    //BST_trav2(b->root);
     return 0;
 }
